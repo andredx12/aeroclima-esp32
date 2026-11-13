@@ -2,7 +2,7 @@
 
 Estação meteorológica simulada no **Wokwi** com ESP32 em **MicroPython**, que mede temperatura, umidade, luminosidade e qualidade do ar, calcula o conforto térmico, gera alertas, faz uma previsão do tempo com base na pressão atmosférica da **OpenWeatherMap** e envia tudo via **MQTT (HiveMQ)** para uma dashboard em tempo real no **Node-RED**.
 
-🔗 **Simulação no Wokwi:** COLE_O_LINK_DO_WOKWI_AQUI
+🔗 **Simulação no Wokwi:** https://wokwi.com/projects/479254361197393921
 
 ## Demonstração
 
