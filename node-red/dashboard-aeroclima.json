@@ -1,691 +1,691 @@
 [
-    {
-        "id": "340416837c6d3335",
-        "type": "tab",
-        "label": "AeroClima",
-        "disabled": false,
-        "info": "",
-        "env": []
+  {
+    "id": "340416837c6d3335",
+    "type": "tab",
+    "label": "AeroClima",
+    "disabled": false,
+    "info": "",
+    "env": []
+  },
+  {
+    "id": "aero_mqtt_dados",
+    "type": "mqtt in",
+    "z": "340416837c6d3335",
+    "name": "Dados ESP32",
+    "topic": "andre_quintino/aeroclima/dados",
+    "qos": "0",
+    "datatype": "json",
+    "broker": "aero_broker",
+    "nl": false,
+    "rap": true,
+    "rh": 0,
+    "inputs": 0,
+    "x": 330,
+    "y": 280,
+    "wires": [
+      [
+        "aero_fn_dados"
+      ]
+    ]
+  },
+  {
+    "id": "aero_fn_dados",
+    "type": "function",
+    "z": "340416837c6d3335",
+    "name": "Separar dados",
+    "func": "const d = msg.payload;\nif (!d) return null;\n\nconst temp = { payload: d.temp };\nconst umid = { payload: d.umid };\nconst conforto = { payload: d.idt + \" (\" + d.conforto + \")\" };\nconst gas = { payload: d.gas };\nconst ar = { payload: d.qualidade };\nconst luz = { payload: d.lux + \" lux (\" + d.nivel_luz + \")\" };\nconst grafico = [\n    { topic: \"Temperatura (°C)\", payload: d.temp },\n    { topic: \"Umidade (%)\", payload: d.umid }\n];\nconst alertas = {\n    payload: (d.alertas && d.alertas.length)\n        ? \"⚠️ \" + d.alertas.join(\" | \")\n        : \"✅ Nenhum alerta\"\n};\n\nreturn [temp, umid, conforto, gas, ar, luz, grafico, alertas];",
+    "outputs": 8,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 560,
+    "y": 280,
+    "wires": [
+      [
+        "aero_gauge_temp"
+      ],
+      [
+        "aero_gauge_umid"
+      ],
+      [
+        "aero_txt_conforto"
+      ],
+      [
+        "aero_gauge_gas"
+      ],
+      [
+        "aero_txt_ar"
+      ],
+      [
+        "aero_txt_luz"
+      ],
+      [
+        "aero_chart"
+      ],
+      [
+        "aero_txt_alertas"
+      ]
+    ]
+  },
+  {
+    "id": "aero_gauge_temp",
+    "type": "ui-gauge",
+    "z": "340416837c6d3335",
+    "name": "Temperatura",
+    "group": "aero_g_clima",
+    "order": 1,
+    "value": "payload",
+    "valueType": "msg",
+    "width": "2",
+    "height": "3",
+    "gtype": "gauge-half",
+    "gstyle": "rounded",
+    "title": "Temperatura",
+    "alwaysShowTitle": false,
+    "units": "°C",
+    "icon": "",
+    "prefix": "",
+    "suffix": "",
+    "segments": [
+      {
+        "from": "-10",
+        "color": "#3b82f6",
+        "text": "",
+        "textType": "label"
+      },
+      {
+        "from": "15",
+        "color": "#22c55e",
+        "text": "",
+        "textType": "label"
+      },
+      {
+        "from": "30",
+        "color": "#f59e0b",
+        "text": "",
+        "textType": "label"
+      },
+      {
+        "from": "35",
+        "color": "#ef4444",
+        "text": "",
+        "textType": "label"
+      }
+    ],
+    "min": "-10",
+    "max": "50",
+    "sizeThickness": 16,
+    "sizeGap": 4,
+    "sizeKeyThickness": 8,
+    "styleRounded": true,
+    "styleGlow": false,
+    "className": "",
+    "x": 830,
+    "y": 180,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "aero_gauge_umid",
+    "type": "ui-gauge",
+    "z": "340416837c6d3335",
+    "name": "Umidade",
+    "group": "aero_g_clima",
+    "order": 2,
+    "width": "2",
+    "height": "3",
+    "gtype": "gauge-half",
+    "gstyle": "rounded",
+    "title": "Umidade",
+    "units": "%",
+    "icon": "",
+    "prefix": "",
+    "suffix": "",
+    "segments": [
+      {
+        "from": "0",
+        "color": "#ef4444"
+      },
+      {
+        "from": "30",
+        "color": "#f59e0b"
+      },
+      {
+        "from": "40",
+        "color": "#22c55e"
+      },
+      {
+        "from": "80",
+        "color": "#3b82f6"
+      }
+    ],
+    "min": "0",
+    "max": "100",
+    "sizeThickness": 16,
+    "sizeGap": 4,
+    "sizeKeyThickness": 8,
+    "styleRounded": true,
+    "styleGlow": false,
+    "className": "",
+    "x": 820,
+    "y": 220,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "aero_txt_conforto",
+    "type": "ui-text",
+    "z": "340416837c6d3335",
+    "group": "aero_g_clima",
+    "order": 3,
+    "width": "4",
+    "height": "1",
+    "name": "Conforto",
+    "label": "Conforto (IDT)",
+    "format": "{{msg.payload}}",
+    "layout": "row-spread",
+    "style": false,
+    "font": "",
+    "fontSize": 16,
+    "color": "#ffffff",
+    "wrapText": false,
+    "className": "",
+    "x": 820,
+    "y": 260,
+    "wires": []
+  },
+  {
+    "id": "aero_gauge_gas",
+    "type": "ui-gauge",
+    "z": "340416837c6d3335",
+    "name": "Gás",
+    "group": "aero_g_luzar",
+    "order": 1,
+    "width": "4",
+    "height": "3",
+    "gtype": "gauge-half",
+    "gstyle": "rounded",
+    "title": "Gás (MQ-2)",
+    "units": "%",
+    "icon": "",
+    "prefix": "",
+    "suffix": "",
+    "segments": [
+      {
+        "from": "0",
+        "color": "#22c55e"
+      },
+      {
+        "from": "30",
+        "color": "#f59e0b"
+      },
+      {
+        "from": "60",
+        "color": "#ef4444"
+      }
+    ],
+    "min": "0",
+    "max": "100",
+    "sizeThickness": 16,
+    "sizeGap": 4,
+    "sizeKeyThickness": 8,
+    "styleRounded": true,
+    "styleGlow": false,
+    "className": "",
+    "x": 810,
+    "y": 300,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "aero_txt_ar",
+    "type": "ui-text",
+    "z": "340416837c6d3335",
+    "group": "aero_g_luzar",
+    "order": 2,
+    "width": "4",
+    "height": "1",
+    "name": "Qualidade do ar",
+    "label": "Qualidade do ar",
+    "format": "{{msg.payload}}",
+    "layout": "row-spread",
+    "style": false,
+    "font": "",
+    "fontSize": 16,
+    "color": "#ffffff",
+    "wrapText": false,
+    "className": "",
+    "x": 840,
+    "y": 340,
+    "wires": []
+  },
+  {
+    "id": "aero_txt_luz",
+    "type": "ui-text",
+    "z": "340416837c6d3335",
+    "group": "aero_g_luzar",
+    "order": 3,
+    "width": "4",
+    "height": "1",
+    "name": "Luminosidade",
+    "label": "Luminosidade",
+    "format": "{{msg.payload}}",
+    "layout": "row-spread",
+    "style": false,
+    "font": "",
+    "fontSize": 16,
+    "color": "#ffffff",
+    "wrapText": false,
+    "className": "",
+    "x": 830,
+    "y": 380,
+    "wires": []
+  },
+  {
+    "id": "aero_chart",
+    "type": "ui-chart",
+    "z": "340416837c6d3335",
+    "group": "aero_g_hist",
+    "name": "Histórico",
+    "label": "Temperatura e Umidade",
+    "order": 1,
+    "chartType": "line",
+    "category": "topic",
+    "categoryType": "msg",
+    "xAxisLabel": "",
+    "xAxisProperty": "",
+    "xAxisPropertyType": "timestamp",
+    "xAxisType": "time",
+    "xAxisFormat": "",
+    "xAxisFormatType": "auto",
+    "yAxisLabel": "",
+    "yAxisProperty": "payload",
+    "yAxisPropertyType": "msg",
+    "ymin": "",
+    "ymax": "",
+    "action": "append",
+    "stackSeries": false,
+    "pointShape": "circle",
+    "pointRadius": 3,
+    "showLegend": true,
+    "removeOlder": "10",
+    "removeOlderUnit": "60",
+    "removeOlderPoints": "",
+    "colors": [
+      "#ef4444",
+      "#0ea5e9",
+      "#22c55e",
+      "#f59e0b",
+      "#a855f7",
+      "#14b8a6",
+      "#ec4899",
+      "#84cc16",
+      "#6366f1"
+    ],
+    "textColor": [
+      "#666666"
+    ],
+    "textColorDefault": true,
+    "gridColor": [
+      "#e5e5e5"
+    ],
+    "gridColorDefault": true,
+    "width": "12",
+    "height": "6",
+    "className": "",
+    "interpolation": "linear",
+    "x": 820,
+    "y": 420,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "aero_txt_alertas",
+    "type": "ui-text",
+    "z": "340416837c6d3335",
+    "group": "aero_g_alertas",
+    "order": 1,
+    "width": "12",
+    "height": "1",
+    "name": "Alertas",
+    "label": "Status",
+    "format": "{{msg.payload}}",
+    "layout": "row-left",
+    "style": true,
+    "font": "",
+    "fontSize": 20,
+    "color": "#fbbf24",
+    "wrapText": false,
+    "className": "",
+    "x": 810,
+    "y": 460,
+    "wires": []
+  },
+  {
+    "id": "aero_mqtt_prev",
+    "type": "mqtt in",
+    "z": "340416837c6d3335",
+    "name": "Previsão ESP32",
+    "topic": "andre_quintino/aeroclima/previsao",
+    "qos": "0",
+    "datatype": "json",
+    "broker": "aero_broker",
+    "nl": false,
+    "rap": true,
+    "rh": 0,
+    "inputs": 0,
+    "x": 340,
+    "y": 580,
+    "wires": [
+      [
+        "aero_fn_prev"
+      ]
+    ]
+  },
+  {
+    "id": "aero_fn_prev",
+    "type": "function",
+    "z": "340416837c6d3335",
+    "name": "Separar previsão",
+    "func": "const p = msg.payload;\nif (!p) return null;\n\nconst previsao = { payload: p.previsao };\nconst pressao = { payload: p.pressao !== null ? p.pressao + \" hPa\" : \"Aguardando API\" };\nconst tendencia = { payload: p.tendencia_texto + \" (\" + p.tendencia + \" hPa)\" };\n\nlet externo = p.clima_api || \"Sem dados\";\nif (p.temp_externa !== null && p.temp_externa !== undefined) {\n    externo += \" | \" + p.temp_externa + \" °C\";\n}\nconst api = { payload: externo };\n\nreturn [previsao, pressao, tendencia, api];",
+    "outputs": 4,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 570,
+    "y": 580,
+    "wires": [
+      [
+        "aero_txt_prev"
+      ],
+      [
+        "aero_txt_pressao"
+      ],
+      [
+        "aero_txt_tend"
+      ],
+      [
+        "aero_txt_api"
+      ]
+    ]
+  },
+  {
+    "id": "aero_txt_prev",
+    "type": "ui-text",
+    "z": "340416837c6d3335",
+    "group": "aero_g_prev",
+    "order": 1,
+    "width": "4",
+    "height": "1",
+    "name": "Previsão",
+    "label": "Previsão",
+    "format": "{{msg.payload}}",
+    "layout": "row-spread",
+    "style": true,
+    "font": "",
+    "fontSize": 20,
+    "color": "#0ea5e9",
+    "wrapText": false,
+    "className": "",
+    "x": 820,
+    "y": 540,
+    "wires": []
+  },
+  {
+    "id": "aero_txt_pressao",
+    "type": "ui-text",
+    "z": "340416837c6d3335",
+    "group": "aero_g_prev",
+    "order": 2,
+    "width": "4",
+    "height": "1",
+    "name": "Pressão",
+    "label": "Pressão",
+    "format": "{{msg.payload}}",
+    "layout": "row-spread",
+    "style": false,
+    "font": "",
+    "fontSize": 16,
+    "color": "#ffffff",
+    "wrapText": false,
+    "className": "",
+    "x": 820,
+    "y": 580,
+    "wires": []
+  },
+  {
+    "id": "aero_txt_tend",
+    "type": "ui-text",
+    "z": "340416837c6d3335",
+    "group": "aero_g_prev",
+    "order": 3,
+    "width": "4",
+    "height": "1",
+    "name": "Tendência",
+    "label": "Tendência",
+    "format": "{{msg.payload}}",
+    "layout": "row-spread",
+    "style": false,
+    "font": "",
+    "fontSize": 16,
+    "color": "#ffffff",
+    "wrapText": false,
+    "className": "",
+    "x": 830,
+    "y": 620,
+    "wires": []
+  },
+  {
+    "id": "aero_txt_api",
+    "type": "ui-text",
+    "z": "340416837c6d3335",
+    "group": "aero_g_prev",
+    "order": 4,
+    "width": "4",
+    "height": "1",
+    "name": "OpenWeather",
+    "label": "OpenWeather",
+    "format": "{{msg.payload}}",
+    "layout": "row-spread",
+    "style": false,
+    "font": "",
+    "fontSize": 16,
+    "color": "#ffffff",
+    "wrapText": false,
+    "className": "",
+    "x": 830,
+    "y": 660,
+    "wires": []
+  },
+  {
+    "id": "aero_broker",
+    "type": "mqtt-broker",
+    "name": "HiveMQ AeroClima",
+    "broker": "broker.hivemq.com",
+    "port": "1883",
+    "clientid": "",
+    "autoConnect": true,
+    "usetls": false,
+    "protocolVersion": "4",
+    "keepalive": "60",
+    "cleansession": true,
+    "autoUnsubscribe": true,
+    "birthTopic": "",
+    "birthQos": "0",
+    "birthPayload": "",
+    "birthMsg": {},
+    "closeTopic": "",
+    "closeQos": "0",
+    "closePayload": "",
+    "closeMsg": {},
+    "willTopic": "",
+    "willQos": "0",
+    "willPayload": "",
+    "willMsg": {},
+    "userProps": "",
+    "sessionExpiry": ""
+  },
+  {
+    "id": "aero_g_clima",
+    "type": "ui-group",
+    "name": "Clima",
+    "page": "aero_pagina",
+    "width": "4",
+    "height": "1",
+    "order": 2,
+    "showTitle": true,
+    "className": "",
+    "visible": "true",
+    "disabled": "false",
+    "groupType": "default",
+    "tab": ""
+  },
+  {
+    "id": "aero_g_luzar",
+    "type": "ui-group",
+    "name": "Luz e Ar",
+    "page": "aero_pagina",
+    "width": "4",
+    "height": "1",
+    "order": 3,
+    "showTitle": true,
+    "className": "",
+    "visible": "true",
+    "disabled": "false",
+    "groupType": "default"
+  },
+  {
+    "id": "aero_g_hist",
+    "type": "ui-group",
+    "name": "Histórico",
+    "page": "aero_pagina",
+    "width": "12",
+    "height": "1",
+    "order": 5,
+    "showTitle": true,
+    "className": "",
+    "visible": "true",
+    "disabled": "false",
+    "groupType": "default"
+  },
+  {
+    "id": "aero_g_alertas",
+    "type": "ui-group",
+    "name": "Alertas",
+    "page": "aero_pagina",
+    "width": "12",
+    "height": "1",
+    "order": 1,
+    "showTitle": true,
+    "className": "",
+    "visible": "true",
+    "disabled": "false",
+    "groupType": "default"
+  },
+  {
+    "id": "aero_g_prev",
+    "type": "ui-group",
+    "name": "Previsão do Tempo",
+    "page": "aero_pagina",
+    "width": "4",
+    "height": "1",
+    "order": 4,
+    "showTitle": true,
+    "className": "",
+    "visible": "true",
+    "disabled": "false",
+    "groupType": "default"
+  },
+  {
+    "id": "aero_pagina",
+    "type": "ui-page",
+    "name": "AeroClima",
+    "ui": "0e0a98d947682be3",
+    "path": "/aeroclima",
+    "icon": "weather-partly-cloudy",
+    "layout": "grid",
+    "theme": "aero_tema",
+    "breakpoints": [
+      {
+        "name": "Default",
+        "px": "0",
+        "cols": "3"
+      },
+      {
+        "name": "Tablet",
+        "px": "576",
+        "cols": "6"
+      },
+      {
+        "name": "Small Desktop",
+        "px": "768",
+        "cols": "9"
+      },
+      {
+        "name": "Desktop",
+        "px": "1024",
+        "cols": "12"
+      }
+    ],
+    "tabs": [],
+    "order": 10,
+    "className": "",
+    "visible": "true",
+    "disabled": "false"
+  },
+  {
+    "id": "0e0a98d947682be3",
+    "type": "ui-base",
+    "name": "AeroClima",
+    "path": "/dashboard",
+    "appIcon": "",
+    "includeClientData": true,
+    "acceptsClientConfig": [
+      "ui-notification",
+      "ui-control"
+    ],
+    "showPathInSidebar": false,
+    "headerContent": "dashboard",
+    "navigationStyle": "none",
+    "titleBarStyle": "default",
+    "showReconnectNotification": true,
+    "notificationDisplayTime": 1,
+    "showDisconnectNotification": true,
+    "allowInstall": false
+  },
+  {
+    "id": "aero_tema",
+    "type": "ui-theme",
+    "name": "Tema AeroClima",
+    "colors": {
+      "surface": "#1e293b",
+      "primary": "#0ea5e9",
+      "bgPage": "#0f172a",
+      "groupBg": "#1e293b",
+      "groupOutline": "#334155"
     },
-    {
-        "id": "aero_mqtt_dados",
-        "type": "mqtt in",
-        "z": "340416837c6d3335",
-        "name": "Dados ESP32",
-        "topic": "andre_quintino/aeroclima/dados",
-        "qos": "0",
-        "datatype": "json",
-        "broker": "aero_broker",
-        "nl": false,
-        "rap": true,
-        "rh": 0,
-        "inputs": 0,
-        "x": 330,
-        "y": 280,
-        "wires": [
-            [
-                "aero_fn_dados"
-            ]
-        ]
-    },
-    {
-        "id": "aero_fn_dados",
-        "type": "function",
-        "z": "340416837c6d3335",
-        "name": "Separar dados",
-        "func": "const d = msg.payload;\nif (!d) return null;\n\nconst temp = { payload: d.temp };\nconst umid = { payload: d.umid };\nconst conforto = { payload: d.idt + \" (\" + d.conforto + \")\" };\nconst gas = { payload: d.gas };\nconst ar = { payload: d.qualidade };\nconst luz = { payload: d.lux + \" lux (\" + d.nivel_luz + \")\" };\nconst grafico = [\n    { topic: \"Temperatura (°C)\", payload: d.temp },\n    { topic: \"Umidade (%)\", payload: d.umid }\n];\nconst alertas = {\n    payload: (d.alertas && d.alertas.length)\n        ? \"⚠️ \" + d.alertas.join(\" | \")\n        : \"✅ Nenhum alerta\"\n};\n\nreturn [temp, umid, conforto, gas, ar, luz, grafico, alertas];",
-        "outputs": 8,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 560,
-        "y": 280,
-        "wires": [
-            [
-                "aero_gauge_temp"
-            ],
-            [
-                "aero_gauge_umid"
-            ],
-            [
-                "aero_txt_conforto"
-            ],
-            [
-                "aero_gauge_gas"
-            ],
-            [
-                "aero_txt_ar"
-            ],
-            [
-                "aero_txt_luz"
-            ],
-            [
-                "aero_chart"
-            ],
-            [
-                "aero_txt_alertas"
-            ]
-        ]
-    },
-    {
-        "id": "aero_gauge_temp",
-        "type": "ui-gauge",
-        "z": "340416837c6d3335",
-        "name": "Temperatura",
-        "group": "aero_g_clima",
-        "order": 1,
-        "value": "payload",
-        "valueType": "msg",
-        "width": "2",
-        "height": "3",
-        "gtype": "gauge-half",
-        "gstyle": "rounded",
-        "title": "Temperatura",
-        "alwaysShowTitle": false,
-        "units": "°C",
-        "icon": "",
-        "prefix": "",
-        "suffix": "",
-        "segments": [
-            {
-                "from": "-10",
-                "color": "#3b82f6",
-                "text": "",
-                "textType": "label"
-            },
-            {
-                "from": "15",
-                "color": "#22c55e",
-                "text": "",
-                "textType": "label"
-            },
-            {
-                "from": "30",
-                "color": "#f59e0b",
-                "text": "",
-                "textType": "label"
-            },
-            {
-                "from": "35",
-                "color": "#ef4444",
-                "text": "",
-                "textType": "label"
-            }
-        ],
-        "min": "-10",
-        "max": "50",
-        "sizeThickness": 16,
-        "sizeGap": 4,
-        "sizeKeyThickness": 8,
-        "styleRounded": true,
-        "styleGlow": false,
-        "className": "",
-        "x": 830,
-        "y": 180,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "aero_gauge_umid",
-        "type": "ui-gauge",
-        "z": "340416837c6d3335",
-        "name": "Umidade",
-        "group": "aero_g_clima",
-        "order": 2,
-        "width": "2",
-        "height": "3",
-        "gtype": "gauge-half",
-        "gstyle": "rounded",
-        "title": "Umidade",
-        "units": "%",
-        "icon": "",
-        "prefix": "",
-        "suffix": "",
-        "segments": [
-            {
-                "from": "0",
-                "color": "#ef4444"
-            },
-            {
-                "from": "30",
-                "color": "#f59e0b"
-            },
-            {
-                "from": "40",
-                "color": "#22c55e"
-            },
-            {
-                "from": "80",
-                "color": "#3b82f6"
-            }
-        ],
-        "min": "0",
-        "max": "100",
-        "sizeThickness": 16,
-        "sizeGap": 4,
-        "sizeKeyThickness": 8,
-        "styleRounded": true,
-        "styleGlow": false,
-        "className": "",
-        "x": 820,
-        "y": 220,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "aero_txt_conforto",
-        "type": "ui-text",
-        "z": "340416837c6d3335",
-        "group": "aero_g_clima",
-        "order": 3,
-        "width": "4",
-        "height": "1",
-        "name": "Conforto",
-        "label": "Conforto (IDT)",
-        "format": "{{msg.payload}}",
-        "layout": "row-spread",
-        "style": false,
-        "font": "",
-        "fontSize": 16,
-        "color": "#ffffff",
-        "wrapText": false,
-        "className": "",
-        "x": 820,
-        "y": 260,
-        "wires": []
-    },
-    {
-        "id": "aero_gauge_gas",
-        "type": "ui-gauge",
-        "z": "340416837c6d3335",
-        "name": "Gás",
-        "group": "aero_g_luzar",
-        "order": 1,
-        "width": "4",
-        "height": "3",
-        "gtype": "gauge-half",
-        "gstyle": "rounded",
-        "title": "Gás (MQ-2)",
-        "units": "%",
-        "icon": "",
-        "prefix": "",
-        "suffix": "",
-        "segments": [
-            {
-                "from": "0",
-                "color": "#22c55e"
-            },
-            {
-                "from": "30",
-                "color": "#f59e0b"
-            },
-            {
-                "from": "60",
-                "color": "#ef4444"
-            }
-        ],
-        "min": "0",
-        "max": "100",
-        "sizeThickness": 16,
-        "sizeGap": 4,
-        "sizeKeyThickness": 8,
-        "styleRounded": true,
-        "styleGlow": false,
-        "className": "",
-        "x": 810,
-        "y": 300,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "aero_txt_ar",
-        "type": "ui-text",
-        "z": "340416837c6d3335",
-        "group": "aero_g_luzar",
-        "order": 2,
-        "width": "4",
-        "height": "1",
-        "name": "Qualidade do ar",
-        "label": "Qualidade do ar",
-        "format": "{{msg.payload}}",
-        "layout": "row-spread",
-        "style": false,
-        "font": "",
-        "fontSize": 16,
-        "color": "#ffffff",
-        "wrapText": false,
-        "className": "",
-        "x": 840,
-        "y": 340,
-        "wires": []
-    },
-    {
-        "id": "aero_txt_luz",
-        "type": "ui-text",
-        "z": "340416837c6d3335",
-        "group": "aero_g_luzar",
-        "order": 3,
-        "width": "4",
-        "height": "1",
-        "name": "Luminosidade",
-        "label": "Luminosidade",
-        "format": "{{msg.payload}}",
-        "layout": "row-spread",
-        "style": false,
-        "font": "",
-        "fontSize": 16,
-        "color": "#ffffff",
-        "wrapText": false,
-        "className": "",
-        "x": 830,
-        "y": 380,
-        "wires": []
-    },
-    {
-        "id": "aero_chart",
-        "type": "ui-chart",
-        "z": "340416837c6d3335",
-        "group": "aero_g_hist",
-        "name": "Histórico",
-        "label": "Temperatura e Umidade",
-        "order": 1,
-        "chartType": "line",
-        "category": "topic",
-        "categoryType": "msg",
-        "xAxisLabel": "",
-        "xAxisProperty": "",
-        "xAxisPropertyType": "timestamp",
-        "xAxisType": "time",
-        "xAxisFormat": "",
-        "xAxisFormatType": "auto",
-        "yAxisLabel": "",
-        "yAxisProperty": "payload",
-        "yAxisPropertyType": "msg",
-        "ymin": "",
-        "ymax": "",
-        "action": "append",
-        "stackSeries": false,
-        "pointShape": "circle",
-        "pointRadius": 3,
-        "showLegend": true,
-        "removeOlder": "10",
-        "removeOlderUnit": "60",
-        "removeOlderPoints": "",
-        "colors": [
-            "#ef4444",
-            "#0ea5e9",
-            "#22c55e",
-            "#f59e0b",
-            "#a855f7",
-            "#14b8a6",
-            "#ec4899",
-            "#84cc16",
-            "#6366f1"
-        ],
-        "textColor": [
-            "#666666"
-        ],
-        "textColorDefault": true,
-        "gridColor": [
-            "#e5e5e5"
-        ],
-        "gridColorDefault": true,
-        "width": "12",
-        "height": "6",
-        "className": "",
-        "interpolation": "linear",
-        "x": 820,
-        "y": 420,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "aero_txt_alertas",
-        "type": "ui-text",
-        "z": "340416837c6d3335",
-        "group": "aero_g_alertas",
-        "order": 1,
-        "width": "12",
-        "height": "1",
-        "name": "Alertas",
-        "label": "Status",
-        "format": "{{msg.payload}}",
-        "layout": "row-left",
-        "style": true,
-        "font": "",
-        "fontSize": 20,
-        "color": "#fbbf24",
-        "wrapText": false,
-        "className": "",
-        "x": 810,
-        "y": 460,
-        "wires": []
-    },
-    {
-        "id": "aero_mqtt_prev",
-        "type": "mqtt in",
-        "z": "340416837c6d3335",
-        "name": "Previsão ESP32",
-        "topic": "andre_quintino/aeroclima/previsao",
-        "qos": "0",
-        "datatype": "json",
-        "broker": "aero_broker",
-        "nl": false,
-        "rap": true,
-        "rh": 0,
-        "inputs": 0,
-        "x": 340,
-        "y": 580,
-        "wires": [
-            [
-                "aero_fn_prev"
-            ]
-        ]
-    },
-    {
-        "id": "aero_fn_prev",
-        "type": "function",
-        "z": "340416837c6d3335",
-        "name": "Separar previsão",
-        "func": "const p = msg.payload;\nif (!p) return null;\n\nconst previsao = { payload: p.previsao };\nconst pressao = { payload: p.pressao !== null ? p.pressao + \" hPa\" : \"Aguardando API\" };\nconst tendencia = { payload: p.tendencia_texto + \" (\" + p.tendencia + \" hPa)\" };\n\nlet externo = p.clima_api || \"Sem dados\";\nif (p.temp_externa !== null && p.temp_externa !== undefined) {\n    externo += \" | \" + p.temp_externa + \" °C\";\n}\nconst api = { payload: externo };\n\nreturn [previsao, pressao, tendencia, api];",
-        "outputs": 4,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 570,
-        "y": 580,
-        "wires": [
-            [
-                "aero_txt_prev"
-            ],
-            [
-                "aero_txt_pressao"
-            ],
-            [
-                "aero_txt_tend"
-            ],
-            [
-                "aero_txt_api"
-            ]
-        ]
-    },
-    {
-        "id": "aero_txt_prev",
-        "type": "ui-text",
-        "z": "340416837c6d3335",
-        "group": "aero_g_prev",
-        "order": 1,
-        "width": "4",
-        "height": "1",
-        "name": "Previsão",
-        "label": "Previsão",
-        "format": "{{msg.payload}}",
-        "layout": "row-spread",
-        "style": true,
-        "font": "",
-        "fontSize": 20,
-        "color": "#0ea5e9",
-        "wrapText": false,
-        "className": "",
-        "x": 820,
-        "y": 540,
-        "wires": []
-    },
-    {
-        "id": "aero_txt_pressao",
-        "type": "ui-text",
-        "z": "340416837c6d3335",
-        "group": "aero_g_prev",
-        "order": 2,
-        "width": "4",
-        "height": "1",
-        "name": "Pressão",
-        "label": "Pressão",
-        "format": "{{msg.payload}}",
-        "layout": "row-spread",
-        "style": false,
-        "font": "",
-        "fontSize": 16,
-        "color": "#ffffff",
-        "wrapText": false,
-        "className": "",
-        "x": 820,
-        "y": 580,
-        "wires": []
-    },
-    {
-        "id": "aero_txt_tend",
-        "type": "ui-text",
-        "z": "340416837c6d3335",
-        "group": "aero_g_prev",
-        "order": 3,
-        "width": "4",
-        "height": "1",
-        "name": "Tendência",
-        "label": "Tendência",
-        "format": "{{msg.payload}}",
-        "layout": "row-spread",
-        "style": false,
-        "font": "",
-        "fontSize": 16,
-        "color": "#ffffff",
-        "wrapText": false,
-        "className": "",
-        "x": 830,
-        "y": 620,
-        "wires": []
-    },
-    {
-        "id": "aero_txt_api",
-        "type": "ui-text",
-        "z": "340416837c6d3335",
-        "group": "aero_g_prev",
-        "order": 4,
-        "width": "4",
-        "height": "1",
-        "name": "OpenWeather",
-        "label": "OpenWeather",
-        "format": "{{msg.payload}}",
-        "layout": "row-spread",
-        "style": false,
-        "font": "",
-        "fontSize": 16,
-        "color": "#ffffff",
-        "wrapText": false,
-        "className": "",
-        "x": 830,
-        "y": 660,
-        "wires": []
-    },
-    {
-        "id": "aero_broker",
-        "type": "mqtt-broker",
-        "name": "HiveMQ AeroClima",
-        "broker": "broker.hivemq.com",
-        "port": "1883",
-        "clientid": "",
-        "autoConnect": true,
-        "usetls": false,
-        "protocolVersion": "4",
-        "keepalive": "60",
-        "cleansession": true,
-        "autoUnsubscribe": true,
-        "birthTopic": "",
-        "birthQos": "0",
-        "birthPayload": "",
-        "birthMsg": {},
-        "closeTopic": "",
-        "closeQos": "0",
-        "closePayload": "",
-        "closeMsg": {},
-        "willTopic": "",
-        "willQos": "0",
-        "willPayload": "",
-        "willMsg": {},
-        "userProps": "",
-        "sessionExpiry": ""
-    },
-    {
-        "id": "aero_g_clima",
-        "type": "ui-group",
-        "name": "Clima",
-        "page": "aero_pagina",
-        "width": "4",
-        "height": "1",
-        "order": 2,
-        "showTitle": true,
-        "className": "",
-        "visible": "true",
-        "disabled": "false",
-        "groupType": "default",
-        "tab": ""
-    },
-    {
-        "id": "aero_g_luzar",
-        "type": "ui-group",
-        "name": "Luz e Ar",
-        "page": "aero_pagina",
-        "width": "4",
-        "height": "1",
-        "order": 3,
-        "showTitle": true,
-        "className": "",
-        "visible": "true",
-        "disabled": "false",
-        "groupType": "default"
-    },
-    {
-        "id": "aero_g_hist",
-        "type": "ui-group",
-        "name": "Histórico",
-        "page": "aero_pagina",
-        "width": "12",
-        "height": "1",
-        "order": 5,
-        "showTitle": true,
-        "className": "",
-        "visible": "true",
-        "disabled": "false",
-        "groupType": "default"
-    },
-    {
-        "id": "aero_g_alertas",
-        "type": "ui-group",
-        "name": "Alertas",
-        "page": "aero_pagina",
-        "width": "12",
-        "height": "1",
-        "order": 1,
-        "showTitle": true,
-        "className": "",
-        "visible": "true",
-        "disabled": "false",
-        "groupType": "default"
-    },
-    {
-        "id": "aero_g_prev",
-        "type": "ui-group",
-        "name": "Previsão do Tempo",
-        "page": "aero_pagina",
-        "width": "4",
-        "height": "1",
-        "order": 4,
-        "showTitle": true,
-        "className": "",
-        "visible": "true",
-        "disabled": "false",
-        "groupType": "default"
-    },
-    {
-        "id": "aero_pagina",
-        "type": "ui-page",
-        "name": "AeroClima",
-        "ui": "0e0a98d947682be3",
-        "path": "/aeroclima",
-        "icon": "weather-partly-cloudy",
-        "layout": "grid",
-        "theme": "aero_tema",
-        "breakpoints": [
-            {
-                "name": "Default",
-                "px": "0",
-                "cols": "3"
-            },
-            {
-                "name": "Tablet",
-                "px": "576",
-                "cols": "6"
-            },
-            {
-                "name": "Small Desktop",
-                "px": "768",
-                "cols": "9"
-            },
-            {
-                "name": "Desktop",
-                "px": "1024",
-                "cols": "12"
-            }
-        ],
-        "tabs": [],
-        "order": 10,
-        "className": "",
-        "visible": "true",
-        "disabled": "false"
-    },
-    {
-        "id": "0e0a98d947682be3",
-        "type": "ui-base",
-        "name": "Estufas do Sr. João",
-        "path": "/dashboard",
-        "appIcon": "",
-        "includeClientData": true,
-        "acceptsClientConfig": [
-            "ui-notification",
-            "ui-control"
-        ],
-        "showPathInSidebar": false,
-        "headerContent": "dashboard",
-        "navigationStyle": "none",
-        "titleBarStyle": "default",
-        "showReconnectNotification": true,
-        "notificationDisplayTime": 1,
-        "showDisconnectNotification": true,
-        "allowInstall": false
-    },
-    {
-        "id": "aero_tema",
-        "type": "ui-theme",
-        "name": "Tema AeroClima",
-        "colors": {
-            "surface": "#1e293b",
-            "primary": "#0ea5e9",
-            "bgPage": "#0f172a",
-            "groupBg": "#1e293b",
-            "groupOutline": "#334155"
-        },
-        "sizes": {
-            "density": "default",
-            "pagePadding": "12px",
-            "groupGap": "12px",
-            "groupBorderRadius": "8px",
-            "widgetGap": "12px"
-        }
-    },
-    {
-        "id": "5ad66fd8980fe973",
-        "type": "global-config",
-        "env": [],
-        "modules": {
-            "@flowfuse/node-red-dashboard": "1.33.0"
-        }
+    "sizes": {
+      "density": "default",
+      "pagePadding": "12px",
+      "groupGap": "12px",
+      "groupBorderRadius": "8px",
+      "widgetGap": "12px"
     }
+  },
+  {
+    "id": "5ad66fd8980fe973",
+    "type": "global-config",
+    "env": [],
+    "modules": {
+      "@flowfuse/node-red-dashboard": "1.33.0"
+    }
+  }
 ]

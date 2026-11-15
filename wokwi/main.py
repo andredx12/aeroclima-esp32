@@ -7,6 +7,9 @@ import network
 import json
 import urequests
 from umqtt.simple import MQTTClient
+import ntptime
+from email_diario import ResumoDiario
+from sheets import enviar_planilha
 
 # ---------- Limites dos alertas ----------
 TEMP_ALTA = 35
@@ -32,6 +35,7 @@ TOPICO_DADOS = "andre_quintino/aeroclima/dados"
 TOPICO_PREVISAO = "andre_quintino/aeroclima/previsao"
 
 INTERVALO_ENVIO = 5000   # ms
+INTERVALO_SHEETS = 30000  # ms (1 linha na planilha a cada 30s)
 
 # ---------- OpenWeatherMap ----------
 OWM_CHAVE = "Sua chave"
@@ -39,7 +43,7 @@ OWM_CIDADE = "Mogi%20das%20Cruzes,BR"
 INTERVALO_API = 60000    # ms (1 consulta por minuto)
 
 
-PRESSAO_TESTE = None
+PRESSAO_TESTE = None   # ex: 1013 pra testar sem a API
 
 # ---------- Sensores ----------
 sensor_dht = dht.DHT22(Pin(15))
@@ -132,6 +136,19 @@ def publicar(cliente, d, alertas, prev):
     pacote["alertas"] = alertas
     cliente.publish(TOPICO_DADOS, json.dumps(pacote))
     cliente.publish(TOPICO_PREVISAO, json.dumps(prev))
+
+
+def sincronizar_hora():
+    mensagem("Sincronizando", "horario...")
+    for _ in range(5):
+        try:
+            ntptime.settime()   # relógio em UTC; o fuso fica no email_diario.py
+            print("Hora sincronizada (NTP)")
+            return True
+        except Exception as e:
+            print("Falha no NTP:", e)
+            time.sleep(1)
+    return False
 
 
 # ---------- Leituras ----------
@@ -414,7 +431,9 @@ def desenhar(d, alertas, piscar, indice):
 
 # ---------- Inicialização ----------
 conectar_wifi()
+sincronizar_hora()
 cliente = conectar_mqtt()
+resumo = ResumoDiario()
 
 dados = {}
 alertas = []
@@ -426,6 +445,7 @@ ultima_leitura = time.ticks_ms() - 2000
 ultimo_pisca = time.ticks_ms()
 ultimo_envio = time.ticks_ms()
 ultima_api = time.ticks_ms() - INTERVALO_API
+ultimo_sheets = time.ticks_ms()
 
 # ---------- Loop principal ----------
 while True:
@@ -455,6 +475,14 @@ while True:
 
         print(dados, "| Alertas:", alertas, "| Previsao:", previsao["previsao"])
 
+        # resumo do dia: soma da leitura e email na virada do dia
+        resumo.adicionar(temp, umid)
+        if resumo.pronto():
+            mensagem("Enviando", "email diario...")
+            if resumo.verificar():
+                mensagem("Email enviado!", "")
+                time.sleep(2)
+
     # envio pro HiveMQ a cada 5s
     if dados and time.ticks_diff(agora, ultimo_envio) >= INTERVALO_ENVIO:
         ultimo_envio = agora
@@ -470,6 +498,11 @@ while True:
             except Exception as e:
                 print("Falha no envio:", e)
                 cliente = None
+
+    # gravação no Google Sheets a cada 30s
+    if dados and dados["temp"] is not None and time.ticks_diff(agora, ultimo_sheets) >= INTERVALO_SHEETS:
+        ultimo_sheets = agora
+        enviar_planilha(dados)
 
     # troca de tela pelo botão (redesenha na hora)
     if trocar_tela:
